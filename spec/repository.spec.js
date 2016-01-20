@@ -14,7 +14,7 @@
     it('creates the given repository methods', inject(function (transport) {
       PeopleRepo.search({q: 'joao'});
 
-      expect(transport.load).toHaveBeenCalledWith({
+      expect(transport.load).toHaveBeenCalledWith('/search.json', {
         url: '/search.json',
         params: {q: 'joao'},
         method: 'GET'
@@ -24,7 +24,7 @@
     it('creates data methods', inject(function (transport) {
       PeopleRepo.create({email: 'joao@joao.com'});
 
-      expect(transport.load).toHaveBeenCalledWith({
+      expect(transport.load).toHaveBeenCalledWith('/people.json', {
         url: '/people.json',
         data: {email: 'joao@joao.com'},
         method: 'POST'

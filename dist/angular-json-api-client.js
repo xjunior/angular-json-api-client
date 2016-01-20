@@ -84,7 +84,7 @@
           } else {
             options.params = params;
           }
-          return transport.load(options);
+          return transport.load(options.url, options);
         };
       };
 
