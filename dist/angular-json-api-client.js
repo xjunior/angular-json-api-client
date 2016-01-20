@@ -33,9 +33,9 @@
             }
             return $q.reject(data);
           },
-          load: function (rel, params, options) {
+          load: function (rel, options) {
             return this.link(rel).then(function (link) {
-              return transport.load(link.href, params, options);
+              return transport.load(link.href, options);
             });
           }
         });
@@ -46,13 +46,8 @@
 
     .service('transport', ['$http', 'resource', function ($http, resource) {
       var transport = {
-        load: function (path, params, config) {
-          var options = _.extend({}, {
-            method: 'GET', url: path, data: params,
-            params: params
-          }, config);
-
-          return $http(options).then(mapPayload)
+        load: function (url, options) {
+          return $http(_.extend({}, {url: url}, options)).then(mapPayload);
         }
       };
 
@@ -83,7 +78,13 @@
     .factory('repository', ['transport', function (transport) {
       var createMethod = function (config) {
         return function (params) {
-          return transport.load(config.path, params, config);
+          var options = _.extend({}, config);
+          if (options.data) {
+            options.data = params;
+          } else {
+            options.params = params;
+          }
+          return transport.load(options);
         };
       };
 

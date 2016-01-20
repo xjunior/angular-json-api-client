@@ -102,7 +102,7 @@
         obj.load('friends', 'params', 'options');
         $rootScope.$digest();
 
-        expect(transport.load).toHaveBeenCalledWith('http://api.example.com/people/123/friends.json', 'params', 'options');
+        expect(transport.load).toHaveBeenCalledWith('http://api.example.com/people/123/friends.json', 'params');
       }));
 
       it('loads a resource using the given link rel', inject(function ($q, $rootScope) {

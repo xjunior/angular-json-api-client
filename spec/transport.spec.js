@@ -55,7 +55,7 @@
           data: [object1, object2]
         });
 
-        transport.load('/search.json', {q: 'joao'}).then(function (people) {
+        transport.load('/search.json', {params: {q: 'joao'}}).then(function (people) {
           expect(people[0].id).toEqual(10);
           expect(people[0].type).toEqual('person');
           expect(people[0].attr('name')).toEqual('joao');
@@ -72,7 +72,7 @@
           data: [object1, object2]
         });
 
-        transport.load('/search.json', {q: 'joao'}).then(function (people) {
+        transport.load('/search.json', {params: {q: 'joao'}}).then(function (people) {
           expect(people[0].id).toEqual(10);
           expect(people[0].type).toEqual('person');
           expect(people[0].attr('name')).toEqual('joao');
@@ -80,6 +80,17 @@
           expect(people[1].id).toEqual(20);
           expect(people[1].type).toEqual('person');
           expect(people[1].attr('name')).toEqual('yoko');
+        });
+        $httpBackend.flush();
+      }));
+
+      it('posts the data when method with option data', inject(function (transport) {
+        $httpBackend.expectPOST('/users.json', {
+          username: 'joao', email: 'joao@joao.com'
+        }).respond(201, {data: object1});
+
+        transport.load('/users.json', {data: {username: 'joao', email: 'joao@joao.com'}, method: 'POST'}).then(function(joao) {
+          expect(joao.id).toEqual(10);
         });
         $httpBackend.flush();
       }));

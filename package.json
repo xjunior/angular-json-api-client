@@ -1,6 +1,5 @@
 {
   "name": "angular-json-api-client",
-  "version": "0.1.0",
   "description": "",
   "scripts": {
     "test": "karma start"
