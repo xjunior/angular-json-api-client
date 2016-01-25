@@ -78,13 +78,13 @@
     .factory('repository', ['transport', function (transport) {
       var createMethod = function (config) {
         return function (params) {
-          var options = _.extend({}, config);
-          if (options.data) {
-            options.data = params;
+          var paramsOptions = {};
+          if (config.data) {
+            paramsOptions.data = params;
           } else {
-            options.params = params;
+            paramsOptions.params = params;
           }
-          return transport.load(options.url, options);
+          return transport.load(config.url, angular.merge({}, config, paramsOptions));
         };
       };
 
