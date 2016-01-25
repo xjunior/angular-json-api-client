@@ -23,6 +23,16 @@
       });
     }));
 
+    it('sends only defaults when no parameter is specified', inject(function (transport) {
+      AccountRepo.searchAdmin();
+
+      expect(transport.load).toHaveBeenCalledWith('/search.json', {
+        url: '/search.json',
+        params: {role: 'Admin'},
+        method: 'GET'
+      });
+    }));
+
     it('extends the params preserving on query string methods', inject(function (transport) {
       AccountRepo.searchAdmin({q: 'joao'});
 

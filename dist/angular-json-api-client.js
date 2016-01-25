@@ -79,10 +79,12 @@
       var createMethod = function (config) {
         return function (params) {
           var paramsOptions = {};
-          if (config.data) {
-            paramsOptions.data = params;
-          } else {
-            paramsOptions.params = params;
+          if (params) {
+            if (config.data) {
+              paramsOptions.data = params;
+            } else {
+              paramsOptions.params = params;
+            }
           }
           return transport.load(config.url, angular.merge({}, config, paramsOptions));
         };
