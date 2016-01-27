@@ -5,7 +5,7 @@
     .factory('resource', ['$q', function ($q) {
       var resource = function (transport, data, included) {
         var mapIncluded = function (records) {
-          return _.map(records, function (record) {
+          return _.map(_.compact(records), function (record) {
             var data = _.findWhere(included, record);
             return resource(transport, angular.merge(record, data), included);
           });

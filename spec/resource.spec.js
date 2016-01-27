@@ -10,6 +10,7 @@
         attributes: {name: 'joao doidao'},
         relationships: {
           bestFriend: {data: {id: 11, type: 'person'}},
+          thumb: {data: null},
           friends: {data: [{id: 11, type: 'person'}, {id: 12, type: 'person'}]}
         },
         links: {
@@ -59,6 +60,12 @@
         var bestFriend = obj.relation('bestFriend');
 
         expect(bestFriend.id).toEqual(11)
+      });
+
+      it('is undefined when the relation is null', function () {
+        var toy = obj.relation('thumb');
+
+        expect(toy).toBe(undefined)
       });
 
       it('loads a collection relation from the object', function () {
