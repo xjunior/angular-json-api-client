@@ -36,6 +36,17 @@
         $httpBackend.flush();
       }));
 
+      it('adds the included resources in collections', inject(function (transport) {
+        $httpBackend.expectGET('http://host/resource.json').respond(200, {data: [object1, object2], included: [object2]});
+
+        transport.load('http://host/resource.json').then(function (objects) {
+          expect(objects[0].id).toEqual(10);
+          expect(objects[0].relation('bestFriend').attr('name')).toEqual('yoko');
+          expect(objects[1].id).toEqual(20);
+        });
+        $httpBackend.flush();
+      }));
+
       it('adds the included resources', inject(function (transport) {
         $httpBackend.expectGET('/best.json').respond(200, {
           data: object1,

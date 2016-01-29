@@ -68,7 +68,7 @@
 
       var mapCollectionPayload = function (json) {
         return _.map(json.data, function (object) {
-          return mapSinglePayload({data: object});
+          return mapSinglePayload({data: object, included: json.included});
         });
       };
 
