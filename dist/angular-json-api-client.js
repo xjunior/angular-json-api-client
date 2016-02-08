@@ -3,11 +3,11 @@
 (function () {
   angular.module('json-api-client', [])
     .factory('resource', ['$q', function ($q) {
-      var resource = function (transport, data, included) {
+      var resource = function (data, included, transport) {
         var mapIncluded = function (records) {
           return _.map(_.compact(records), function (record) {
             var data = _.findWhere(included, record);
-            return resource(transport, angular.merge(record, data), included);
+            return resource(angular.merge(record, data), included, transport);
           });
         };
 
@@ -63,7 +63,7 @@
       var mapSinglePayload = function (json) {
         var data = json.data;
         var included = json.included;
-        return resource(transport, data, included);
+        return resource(data, included, transport);
       };
 
       var mapCollectionPayload = function (json) {

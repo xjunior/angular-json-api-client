@@ -5,7 +5,7 @@
     var transport, obj;
     beforeEach(inject(function (resource) {
       transport = jasmine.createSpyObj('transport', ['load']);
-      obj = resource(transport, {
+      obj = resource({
         id: 10, type: 'person',
         attributes: {name: 'joao doidao'},
         relationships: {
@@ -19,7 +19,7 @@
         }
       }, [
         {id: 11, type: 'person', attributes: {name: 'lorim'}}
-      ]);
+      ], transport);
     }));
 
     it('maps the data id and type', function () {
