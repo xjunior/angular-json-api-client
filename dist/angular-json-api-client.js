@@ -2,16 +2,28 @@
 
 (function () {
   angular.module('json-api-client', [])
-    .factory('resource', ['$q', function ($q) {
-      var resource = function (data, included, transport) {
-        var mapIncluded = function (records) {
-          return _.map(_.compact(records), function (record) {
-            var data = _.findWhere(included, record);
-            return resource(angular.merge(record, data), included, transport);
-          });
+    .factory('linked', ['$q', function ($q) {
+      return function (links, transport) {
+        return {
+          link: function (rel) {
+            var link = links[rel];
+            if (link) {
+              return $q.when(link);
+            }
+            return $q.reject(rel + ' does not exist');
+          },
+          load: function (rel, options) {
+            return this.link(rel).then(function (link) {
+              return transport.load(link.href, options);
+            });
+          }
         };
+      };
+    }])
 
-        return _.extend({}, data, {
+    .factory('resource', ['linked', function (linked) {
+      var resource = function (data, included, transport) {
+        return _.extend(linked(data.links, transport), data, {
           attr: function (name) {
             return data.attributes && data.attributes[name];
           },
@@ -21,30 +33,40 @@
               return;
             }
             if (_.isArray(relation.data)) {
-              return mapIncluded(relation.data);
+              return resource.map(relation.data, included, transport)
             }
 
-            return _.first(mapIncluded([relation.data]));
-          },
-          link: function (rel) {
-            var link = data.links[rel];
-            if (link) {
-              return $q.when(link);
-            }
-            return $q.reject(data);
-          },
-          load: function (rel, options) {
-            return this.link(rel).then(function (link) {
-              return transport.load(link.href, options);
-            });
+            return _.first(resource.map([relation.data], included, transport));
           }
+        });
+      };
+
+      resource.map = function (records, included, transport) {
+        return _.map(_.compact(records), function (record) {
+          var data = _.findWhere(included, record);
+          return resource(angular.merge(record, data), included, transport);
         });
       };
 
       return resource;
     }])
 
-    .service('transport', ['$http', 'resource', function ($http, resource) {
+    .factory('collection', ['resource', 'linked', function (resource, linked) {
+      return function (collection, transport) {
+        var resources = resource.map(collection.data, collection.included, transport);
+
+        return _.extend(resources, linked(collection.links, transport), {
+          next: function () {
+            return this.load('next');
+          },
+          last: function () {
+            return this.load('last');
+          }
+        });
+      };
+    }])
+
+    .service('transport', ['$http', 'resource', 'collection', function ($http, resource, collection) {
       var transport = {
         load: function (url, options) {
           return $http(_.extend({}, {url: url}, options)).then(mapPayload);
@@ -54,22 +76,10 @@
       var mapPayload = function (payload) {
         var json = payload.data;
         if (_.isArray(json.data)) {
-          return mapCollectionPayload(json);
+          return collection(json, transport);
         } else {
-          return mapSinglePayload(json);
+          return resource(json.data, json.included, transport);
         }
-      };
-
-      var mapSinglePayload = function (json) {
-        var data = json.data;
-        var included = json.included;
-        return resource(data, included, transport);
-      };
-
-      var mapCollectionPayload = function (json) {
-        return _.map(json.data, function (object) {
-          return mapSinglePayload({data: object, included: json.included});
-        });
       };
 
       return transport;
