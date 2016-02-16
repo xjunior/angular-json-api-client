@@ -14,7 +14,8 @@
           },
           load: function (rel, options) {
             return this.link(rel).then(function (link) {
-              return transport.load(link.href, options);
+              var url = link.href || link;
+              return transport.load(url, options);
             });
           }
         };

@@ -57,41 +57,12 @@
       }))
     });
 
-    describe('.link', function () {
-      it('is the referred link when it exists', inject(function ($rootScope) {
-        var callback = jasmine.createSpy();
-        people.link('self').then(callback);
-        $rootScope.$digest();
+    it('is linked', inject(function ($rootScope) {
+      var callback = jasmine.createSpy();
+      people.link('self').then(callback);
+      $rootScope.$digest();
 
-        expect(callback).toHaveBeenCalledWith({href: 'http://api.example.com/people.json'});
-      }));
-
-      it('is undefined when the referred link does not exist', inject(function ($rootScope) {
-        var callback = jasmine.createSpy();
-        people.link('enemies').then(null, callback);
-        $rootScope.$digest();
-
-        expect(callback).toHaveBeenCalled();
-      }));
-    });
-
-    describe('.load', function () {
-      it('fails if the link does not exist', inject(function ($q, $rootScope) {
-        var callback = jasmine.createSpy();
-        people.load('enemies').then(null, callback);
-        $rootScope.$digest();
-
-        expect(callback).toHaveBeenCalled();
-      }));
-
-      it('loads a resource using the given link rel', inject(function ($q, $rootScope) {
-        transport.load.and.returnValue($q.when([]));
-
-        people.load('next', 'options');
-        $rootScope.$digest();
-
-        expect(transport.load).toHaveBeenCalledWith('http://api.example.com/people.json?page=3', 'options');
-      }));
-    });
+      expect(callback).toHaveBeenCalledWith({href: 'http://api.example.com/people.json'});
+    }));
   });
 })();
