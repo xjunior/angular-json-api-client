@@ -88,6 +88,10 @@
 
     .factory('repository', ['transport', function (transport) {
       var createMethod = function (config) {
+        var url = _.template(config.url, {
+          interpolate: /\{\{(.+?)\}\}/g
+        })
+
         return function (params) {
           var paramsOptions = {};
           if (params) {
@@ -97,7 +101,9 @@
               paramsOptions.params = params;
             }
           }
-          return transport.load(config.url, angular.merge({}, config, paramsOptions));
+          var options = angular.merge({}, config, paramsOptions);
+          delete options.url;
+          return transport.load(url(params), options);
         };
       };
 
