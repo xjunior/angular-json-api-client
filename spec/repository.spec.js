@@ -23,6 +23,15 @@
       });
     }));
 
+    it('accepts string interpolation based on the attributes of the resource passed as param', inject(function (transport) {
+      AccountRepo.delete({attributes: {id: 10}})
+
+      expect(transport.load).toHaveBeenCalledWith('/account/10.json', {
+	data: {attributes: {id: 10}},
+        method: 'DELETE'
+      });
+    }));
+
     it('extends the params preserving defaults', inject(function (transport) {
       AccountRepo.update({email: 'joao@palhares.com'});
 

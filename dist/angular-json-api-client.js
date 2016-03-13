@@ -88,23 +88,27 @@
 
     .factory('repository', ['transport', function (transport) {
       var createMethod = function (config) {
-        var url = _.template(config.url, {
+        var options = angular.copy(config);
+        var urlTemplate = _.template(options.url, {
           interpolate: /\{\{(.+?)\}\}/g
-        })
+        });
+	delete options.url;
 
-        return function (params) {
-          var paramsOptions = {};
-          if (params) {
-            if (config.data) {
-              paramsOptions.data = params;
-            } else {
-              paramsOptions.params = params;
-            }
-          }
-          var options = angular.merge({}, config, paramsOptions);
-          delete options.url;
-          return transport.load(url(params), options);
+        var method = function (params) {
+          return transport.load(method.url(params), method.options(params));
         };
+
+	method.options = function (params) {
+          var paramsOptions = params ? (config.data ? {data: params} : {params: params}) : null;
+	  return angular.merge({}, options, paramsOptions);
+	};
+
+	method.url = function (params) {
+          var urlParams = angular.merge({}, params, params && params.attributes);
+	  return urlTemplate(urlParams);
+	};
+
+	return method;
       };
 
       var createMethods = function (repository, setup) {
