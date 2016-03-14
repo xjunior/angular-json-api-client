@@ -88,6 +88,7 @@
 
     .factory('repository', ['transport', function (transport) {
       var createMethod = function (config) {
+        config.method = config.method || 'GET';
         var urlTemplate = _.template(config.url, {
           interpolate: /\{\{(.+?)\}\}/g
         });

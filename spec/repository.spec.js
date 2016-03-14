@@ -6,7 +6,7 @@
     beforeEach(inject(function (transport, repository) {
       spyOn(transport, 'load');
       AccountRepo = repository({
-        search: {url: '/search.json', method: 'GET'},
+        search: {url: '/search.json'},
         searchAdmin: {url: '/search.json', method: 'GET', params: {role: 'Admin'}},
         deleteNoData: {url: '/account/{{id}}.json', method: 'DELETE', data: false},
         delete: {url: '/account/{{id}}.json', method: 'DELETE'},
