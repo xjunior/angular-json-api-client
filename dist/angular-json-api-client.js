@@ -88,27 +88,42 @@
 
     .factory('repository', ['transport', function (transport) {
       var createMethod = function (config) {
-        var options = angular.copy(config);
-        var urlTemplate = _.template(options.url, {
+        var urlTemplate = _.template(config.url, {
           interpolate: /\{\{(.+?)\}\}/g
         });
-	delete options.url;
-
-        var method = function (params) {
-          return transport.load(method.url(params), method.options(params));
+        delete config.url;
+        var sanitize = function (object) {
+          return angular.fromJson(angular.toJson(object));
+        };
+        var options = function (params) {
+          var opts = angular.copy(config);
+          var paramsOptions;
+          if (opts.method.toUpperCase() === 'GET') {
+            if (opts.params === false) {
+              delete opts.params;
+            } else if (params) {
+              paramsOptions = {params: sanitize(params)};
+            }
+          } else {
+            if (opts.data === false) {
+              delete opts.data;
+            } else if (params) {
+              paramsOptions = {data: sanitize(params)};
+            }
+          }
+          return angular.merge({}, opts, paramsOptions);
         };
 
-	method.options = function (params) {
-          var paramsOptions = params ? (config.data ? {data: params} : {params: params}) : null;
-	  return angular.merge({}, options, paramsOptions);
-	};
+        var method = function (params) {
+          return transport.load(method.url(params), options(params));
+        };
 
-	method.url = function (params) {
+        method.url = function (params) {
           var urlParams = angular.merge({}, params, params && params.attributes);
-	  return urlTemplate(urlParams);
-	};
+          return urlTemplate(urlParams);
+        };
 
-	return method;
+        return method;
       };
 
       var createMethods = function (repository, setup) {
